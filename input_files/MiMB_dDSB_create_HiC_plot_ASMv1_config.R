@@ -25,14 +25,14 @@ inputfileCF <- "MiMB_dDSB_ZP591.22_ASMv1_calFactors240221-rp10M.txt"  # (with co
 idColumnCF <- "Sample.id"
 factorColumn <- "Cal.Factor"  # e.g. "Cal.Factor" or "RP10M"
 
-# additional DSB track (vertical lines)
-plusDSB <- TRUE  # FALSE or TRUE
+# reference track displayed as vertical lines (optional; dpp format: chrom, position, depth), e.g. Spo11 oligo 5prime ends
+plusRef <- TRUE  # FALSE or TRUE
 workingDirIND <- workingDirINC
 inputfileD <- "Spo11.oligos_t4_ASMv1_5prime_dpp.txt"
 sampleNameD <- "Mohibullah (2017),\nwt t4"
-sampleNameDF <- "Moh1" # for output filename
+sampleNameDF <- "Moh.wt.t4" # for output filename
 scaleFactorD <- 0.6  # scaling factor for signal depths
 lineWidthD <- 2
 selColorD <- "grey40" 
 alphaFactorD <- 0.6  # 0 - 1; the higher, the lower the transparence
-plotOrder <- "DSBtoBack"  # "DSBtoFront" | "DSBtoBack"
+plotOrder <- "refToBack"  # "refToFront" | "refToBack"
