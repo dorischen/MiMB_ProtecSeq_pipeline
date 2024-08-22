@@ -2,7 +2,7 @@
 
 # reference genome
 genome <- "ZP591.22" 
-genomeDataPath <- "/mnt/Z/forMiMB/input_files/genomes/config_file_genomes.R"   # with chromosome ids (saved in output files), names (as in fasta and alignment files), and lengths
+genomeDataPath <- paste0(workingDirINC,"/genomes/config_file_genomes.R")   # with chromosome ids (saved in output files), names (as in fasta and alignment files), and lengths
 
 # alignment format
 inputFormat <- "hisat"  # "ngm" | "hisat"; alignment tool

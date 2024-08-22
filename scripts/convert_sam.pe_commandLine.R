@@ -2,7 +2,7 @@
 ## INPUT: sam alignment file 
 ## OUTPUT: dpp, fd or filledDpp tables
 ## Author: Doris Chen 
-## version 240503
+## version 240727
 
 ## get library path
 libLoc <- .libPaths()[1]   # [1] in case of multiple library locations
@@ -164,43 +164,7 @@ convert_sam_to_table_pe <- function(workingDirIN, inputfile, inputFormat, seqFor
    return(list(parsedTableF, parsedTable5p))
 }
 
-# read_sam_file_pe <- function(workingDirIN, inputfile, format)  # kept only for HISAT option
-# {  setwd(workingDirIN)
-#    #samTable0 <- read.csv(inputfile, header=FALSE, sep="\t", stringsAsFactors=FALSE, skip=length(chroms)+3, fill=TRUE)
-#    samTable0 <- data.table(read.csv(inputfile, header=FALSE, sep="\t", stringsAsFactors=FALSE, skip=length(chroms)+2, col.names=samHeaderOri))  # hisat with different nr of columns in one table
-#    samTable0 <- samTable0[,names(samTable0)[dropVector]:=NULL]
-#    
-#    if(grep("ngm",format)==1)
-#    {  setnames(samTable0, samHeader)
-#       samTable0 <- samTable0[order(QNAME,FLAG),]  # sort so that first read first (in ngm the other way round)
-#       samTable0[,READ.NR:=rep(c(1,2), nrow(samTable0)/2)]   # assign /1 and /2 
-#    } else
-#    if(format=="hisat")
-#    {  samTable0[,INDEX:=seq(1,nrow(samTable0))]
-#       subTableZS <- samTable0[grep("ZS",V13),]  # extract rows with additional ZS column
-#       setnames(subTableZS, samHeader0)
-#       subTable <- samTable0[!grep("ZS",V13),.SD,.SDcols=-(ncol(samTable0)-1)]  # extract rest
-#       setnames(subTable, samHeader0[-11])
-#       samTable0 <- rbindlist(list(subTable, subTableZS[,c("ZS"):=NULL]), use.names=TRUE)  # remove ZS column and union
-#       samTable0[,QLENGTH:=extract_length(CIGAR), by=INDEX]
-#       #samTable0[grep("S",CIGAR),QLENGTH:=QLENGTH-extract_soft_length(CIGAR), by=INDEX]  # add CIGAR parser later (remove soft clippings)
-#       samTable0 <- samTable0[order(INDEX),.(QNAME,FLAG,RNAME,POS,QLENGTH,MAPQ,CIGAR,FLENGTH,SCORE,EDITDIST,HITS,PAIRCLASS)]  # select columns
-#       samTable0[,READ.NR:=rep(c(1,2), nrow(samTable0)/2)]   # assign /1 and /2
-#    }
-#    samTable0[,FLENGTH:=ifelse(FLAG %in% vFlagsPEplus, abs(FLENGTH), ifelse(FLAG %in% vFlagsPEminus, -abs(FLENGTH), FLENGTH))]  # correction of orientation (sometimes wrong!!) despite correct FLAGs
-#    samTable0[,STRAND:=ifelse(FLENGTH>0, "+", "-")]
-#    
-#    # remove tags
-#    for(tagName in tagTable$name)
-#    {  samTable0[,eval(tagName):=str_replace(base::get(tagName), tagTable[name==tagName,tag], "")]
-#    }
-#    samTable <- convert_to_numeric(samTable0, vNumeric)
-#    
-#    print(samTable)
-#    return(samTable)
-# }
-
-convert_to_dpp <- function(expandedTable, outputOption, createTable, workingDirOUT, outfileD) 
+convert_to_dpp <- function(expandedTable, outputOption, createFile=FALSE, workingDirOUT, outfileD) 
 {   dppTable0 <- expandedTable[,.(depth=sum(count)), by=.(chrom, strand, position)]
 
     if(outputOption=="filled")
@@ -214,20 +178,22 @@ convert_to_dpp <- function(expandedTable, outputOption, createTable, workingDirO
     setkey(dppTable, chrom, position)
     print(dppTable)
       
-    if(createTable)
+    if(createFile)
     {  save_table(dppTable, workingDirOUT, outfile=outfileD)  # create file
     } else
        write.table(dppTable, file=outfileD, append=TRUE, sep="\t", dec=".", row.names=FALSE, col.names=FALSE, quote=FALSE)  # append to file
 }
 
 convert_and_save_dpp <- function(parsedTable, maxRowCountPC, outputOption, workingDirOUT, fileNameBase, outputSuffix)
-{  createTable <- TRUE  # new table (and file) created 
+{  createFile <- TRUE  # new table (and file) created 
+   outfile <- paste0(fileNameBase,"_",outputSuffix)
+ 
    for(chr in unique(parsedTable$chrom))  # to avoid memory problems
    {  print(chr)
       parsedTableChr <- parsedTable[chrom==chr,]
       setkey(parsedTableChr, start, end)
       rowCountPC <- nrow(parsedTableChr)
-      
+           
       if(rowCountPC>maxRowCountPC)
       {  parsedTableChr[,rowIndex:=.I]  # get gaps which split overlapping read pairs (should be processed together)
          setkey(parsedTableChr, rowIndex)
@@ -244,18 +210,6 @@ convert_and_save_dpp <- function(parsedTable, maxRowCountPC, outputOption, worki
             # remove rows from table
             parsedTableChr <- parsedTableChr[rowIndex>max(parsedTableChrSub$rowIndex),]  # remaining rows
             
-            # get reads overlapping border and split them up (otherwise will not be counted correctly !!)
-            overlapTable <- parsedTableChrSub[end>lastEnd]
-            
-            if(nrow(overlapTable)>0)
-            {  # trim ends in current subtable
-               parsedTableChrSub[rowIndex %in% overlapTable$rowIndex, end:=lastEnd]
-              
-               # trim starts in overlapTable and append to main table
-               overlapTable[,start:=lastEnd+1]
-               parsedTableChr <- rbindlist(list(overlapTable,parsedTableChr))
-            }
-            
             # expand positions, convert to dpp 
             if(outputOption=="5prime")
             {  expTableChrSub <- parsedTableChrSub[,.(position=ifelse(strand=="+", start, end)), by=.(index, chrom, strand, count)]
@@ -263,10 +217,8 @@ convert_and_save_dpp <- function(parsedTable, maxRowCountPC, outputOption, worki
               expTableChrSub <- parsedTableChrSub[,.(position=seq(start,end)), by=.(index, chrom, strand, count)]
             
             # save in file
-            outfile <- paste0(fileNameBase,"_",outputSuffix)
-            convert_to_dpp(expTableChrSub, outputOption, createTable, workingDirOUT, outfile)  # conversion to dpp and saving of data to file
-            print(paste0(outfile," was saved to ", workingDirOUT))
-            createTable <- FALSE
+            convert_to_dpp(expTableChrSub, outputOption, createFile, workingDirOUT, outfile)  # conversion to dpp and saving of data to file
+            createFile <- FALSE
          }
       } else
       {  # expand positions, convert to dpp   
@@ -276,11 +228,13 @@ convert_and_save_dpp <- function(parsedTable, maxRowCountPC, outputOption, worki
            expTableChr <- parsedTableChr[,.(position=seq(start,end)), by=.(index, chrom, strand, count)]
          
          # save in file
-         outfile <- paste0(fileNameBase,"_",outputSuffix)
-         convert_to_dpp(expTableChr, outputOption, createTable, workingDirOUT, outfile) # conversion to dpp and saving of data to file
-         createTable <- FALSE
+         convert_to_dpp(expTableChr, outputOption, createFile, workingDirOUT, outfile) # conversion to dpp and saving of data to file
+         createFile <- FALSE
       }
    }
+   
+   print(paste0(outfile," was saved to ", workingDirOUT))
+  
 }
 
 create_and_save_pdf <- function(plotTable, plotType, workingDirOUT, fileNameBase, plotWidth, plotHeight)
@@ -323,7 +277,7 @@ move_files_to_folder <- function(filePattern, workingDirOUT, subfolder)
 }
 
 
-## INPUT (user-defined parameters)
+### INPUT
 ## COMMAND-LINE INPUT
 argCount <- 4
 args <- commandArgs(trailingOnly=TRUE)
@@ -342,7 +296,7 @@ inputfileS <- args[4]
 # inputfileC <- "MiMB_dDSB_convert_sam.pe_ASMv1_config.R"
 # workingDirINS <- "Z:/forMiMB/mapping_results/scer_specific/sub2/"
 # inputfileS <- "SRR14093079_ngm-globalR1i0.96k11_ZP591.22_unaligned_ASMv1.sam"  # sam file (..1-based!!; BAM files are 0-based)
-# 
+
 source(paste0(workingDirINC,"/",inputfileC))  
 source(genomeDataPath)
 
@@ -353,7 +307,7 @@ if(!file.exists(workingDirOUT))
    print(paste(workingDirOUT,"created"))
 }
 
-scriptSuffix <- "240503"
+scriptSuffix <- "240727"
 fileSuffix <- paste0("_conv",scriptSuffix)
 if(minScore>0)
   fileSuffix <- paste0(fileSuffix,"-minS",minScore)
@@ -454,28 +408,27 @@ print(paste0("Log saved in ",workingDirOUT,"/",logfile))
 
 
 # move files to subfolders
-move_files_to_folder("\\.log", workingDirOUT, "/log_files")
+move_files_to_folder(paste0(fileNameBase,".*\\.log"), workingDirOUT, "/log_files")
 
 if("filled" %in% outputOptions)
-  move_files_to_folder("_filledDpp.txt", workingDirOUT, "/filledDpp_files")
+  move_files_to_folder(paste0(fileNameBase,".*_filledDpp.txt"), workingDirOUT, "/filledDpp_files")
 
 if("5prime" %in% outputOptions)
-  move_files_to_folder("_5prime_dpp.txt", workingDirOUT, "/dpp_files")
+  move_files_to_folder(paste0(fileNameBase,".*_5prime_dpp.txt"), workingDirOUT, "/dpp_files")
 
 if("fd" %in% outputOptions)
-  move_files_to_folder("_fd.txt", workingDirOUT, "/fd_files")
+  move_files_to_folder(paste0(fileNameBase,".*_fd.txt"), workingDirOUT, "/fd_files")
 
-if(saveTableParsed)
-  move_files_to_folder("_table.txt", workingDirOUT, "/parsed_tables")
+if(saveLengthTable)
+  move_files_to_folder(paste0(fileNameBase,".*_lengthTable.txt"), workingDirOUT, "/lengths/tables")
 
-if(saveLengthTable | saveLengthPlot)
-  move_files_to_folder("_length", workingDirOUT, "/lengths")
+if(saveLengthPlot)
+  move_files_to_folder(paste0(fileNameBase,".*_lengthDist.pdf"), workingDirOUT, "/lengths")
 
 if(saveTableOutward)
-  move_files_to_folder("outward.txt", workingDirOUT, "/out_tables")
+  move_files_to_folder(paste0(fileNameBase,".*outward.txt"), workingDirOUT, "/out_tables")
 
-
-
-
+if(saveTableParsed)
+  move_files_to_folder(paste0(fileNameBase,".*_table.txt"), workingDirOUT, "/parsed_tables")
 
 

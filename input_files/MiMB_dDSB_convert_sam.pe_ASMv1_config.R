@@ -1,11 +1,11 @@
-## Input for convert_sam.pe_commandLine.R, v.240503
+## Input for convert_sam.pe_commandLine.R, v.240727
 
 # reference genome
 genome <- "ASMv1" 
-genomeDataPath <- "/mnt/Z/forMiMB/input_files/genomes/config_file_genomes.R"   # with chromosome ids (saved in output files), names (as in fasta and alignment files), and lengths
+genomeDataPath <- paste0(workingDirINC,"/genomes/config_file_genomes.R")   # add absolute path; with chromosome ids (saved in output files), names (as in fasta and alignment files), and lengths
 
 # alignment format
-inputFormat <- "ngm"  # ngm (| hisat); alignment tool
+inputFormat <- "ngm"  # "ngm" | "hisat"; alignment tool
 
 # output
 workingDirOUT <- workingDirINS  # output directory, parent folder for subfolders (/dpp_files, /filledDpp_files, /fd_files)

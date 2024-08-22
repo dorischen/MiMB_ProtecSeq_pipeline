@@ -1,6 +1,7 @@
 ## calculation of calibration factors from read (pair) counts
 ## INPUT: read (pair) count table
 ## OUTPUT: (optional) read (pair) count table with percentages and sample names; table with counts, RPM, OR and calibration factors
+## v. 240724
 
 ## get library path
 libLoc <- .libPaths()[1]   # [1] in case of multiple library locations
@@ -20,7 +21,8 @@ save_table <- function(inputTable, workingDirOUT, outfile, withColNames=TRUE, wi
 }
 
 
-## INPUT (user-defined parameters)
+### INPUT
+## COMMAND-LINE INPUT
 argCount <- 4
 args <- commandArgs(trailingOnly=TRUE)
 print("Parameters:")
@@ -33,7 +35,7 @@ inputfileC <- args[2]   # config file (with input parameters)
 workingDirINR <- file.path(args[3]) # directory with read count table (Sample id, Total, Clipped, EXP_GENOME specific, CAL_GENOME specific)
 workingDirOUT <- file.path(args[4])
 
-## for interactive tests:
+## INTERACTIVE INPUT
 # workingDirINC <- "Z:/forMiMB/input_files"
 # inputfileC <- "MiMB_dDSB_calculate_calfactors_config.R"
 # workingDirINR <- "Z:/forMiMB/"
@@ -43,7 +45,7 @@ source(paste0(workingDirINC,"/",inputfileC))
 
 
 ## DEFAULTS
-scriptSuffix <- "240221"
+scriptSuffix <- "240724"
 fileSuffix <- paste0("_calFactors",scriptSuffix)
 rpmString <- as.character(rpmCount/1000000)
 if(rpmString!="1")
@@ -90,7 +92,7 @@ sampleTable0
 
 sampleTable <- data.table::copy(sampleTable0[,.(base::get(idColumnS), base::get(nameColumnS), base::get(typeColumnS), base::get(parentColumnS))])
 setnames(sampleTable, c("Sample.id", "Sample", "Type", "Parent.id"))
-sampleTable[,.(Sample.id=as.character(Sample.id), Parent.id=as.character(Parent.id))]
+sampleTable[,`:=`(Sample.id=as.character(Sample.id), Parent.id=as.character(Parent.id))]
 sampleTable
 
 # add sample names

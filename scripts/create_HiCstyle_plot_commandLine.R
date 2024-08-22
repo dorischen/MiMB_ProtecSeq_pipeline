@@ -69,8 +69,8 @@ add_alpha <- function(vColors, alpha=255)  # alpha between 0 and 1!!
 
 
 
-## INPUT (user-defined parameters)
-## COMMAND-LINE input
+## INPUT 
+## COMMAND-LINE INPUT
 argCount <- 5
 args <- commandArgs(trailingOnly=TRUE)
 print("Parameters:")
@@ -84,7 +84,7 @@ workingDirINF <- file.path(args[3])
 inputfileF <- args[4]
 sampleId <- args[5]
 
-# ## INTERACTIVE input
+# ## INTERACTIVE INPUT
 # workingDirINC <- "Z:/forMiMB/input_files"
 # inputfileC <- "MiMB_dDSB_create_HiC_plot_ASMv1_config.R"
 # workingDirINF <- "Z:/forMiMB/mapping_results/scer_specific/fd_files"
@@ -269,4 +269,3 @@ par(oldpar)  # reset par settings
 
 
 
-                                                                                                  

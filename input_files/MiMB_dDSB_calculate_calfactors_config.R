@@ -1,4 +1,4 @@
-## Input for clculate_calibration_factors_commandLine.R, v.240221
+## Input for calculate_calibration_factors_commandLine.R, v.240724
 
 ## read count table *_counts*.txt (Sample id, Total, Clipped, EXP_GENOME specific, CAL_GENOME specific)
 inputfileR <- "MiMB_dDSB_ZP591.22_ASMv1_counts240318.txt" 

@@ -2,7 +2,7 @@
 ## INPUT: (clipped) fastq(.gz) files containing reads from two species (experimental and calibration reference genomes)
 ## OUTPUT: species-specific and common alignments 
 ## Author: Doris Chen (April, 2016)
-## version 240326
+## version 240821
 
 
 ## FUNCTIONS
@@ -101,7 +101,7 @@ function extract_ids_and_remove()
    
    # extract reads ids from common
    awk '!($1 ~ /^@/)' $COMMONFILE | cut -f1 | sort | uniq > ${OUTFILEBASE}_reads.txt
-   java -Xmx${MEM}000m -classpath $JAVASAMPATH SAMManipulator -sam $ALIGNFILE -ids ${OUTFILEBASE}_reads.txt -option delete -out $OUTFILESUFFIX
+   java -Xmx${MEM}000m -jar ${JAVASAMPATH}SAMManipulator.jar -sam $ALIGNFILE -ids ${OUTFILEBASE}_reads.txt -option delete -out $OUTFILESUFFIX
    
    echo "$OUTFILE aligned pairs: $(($(${SAMTOOLSPATH}samtools view -c ${OUTFILE})/2))" | tee -a $LOGFILE
    
@@ -148,7 +148,7 @@ function usage()
 			echo "  -1 ... first genome to align to, calibration genome"
 			echo "  -2 ... second, specific genome to align to, 'experimental' genome"
 			echo "  -t ... number of threads"
-			echo "  -m ... GB max. RAM"  # for SAMManipulator.java
+			echo "  -m ... GB max. RAM"  # for SAMManipulator.jar
 			echo "  -n ... alignment tool, NextGenMap ('NGM') or HISAT2 ('HISAT')"
 			echo "  -e ... minimum percent identity for alignment (max.=1)"
 			echo "  -c ... either local or global alignment"
@@ -194,7 +194,7 @@ done
 
 
 ## DEFAULTS
-SCRIPTSUFFIX=240326
+SCRIPTSUFFIX=240821
 
 if [ "$MEM" = "" ]; then
   echo "-m RAM_MEMORY_GB missing !!"  # otherwise later cryptic error message when running Java script

@@ -93,7 +93,8 @@ move_files_to_folder <- function(filePattern, workingDirOUT, subfolder)
 }
 
 
-## INPUT (user-defined parameters)
+### INPUT
+## COMMAND-LINE INPUT
 argCount <- 5
 args <- commandArgs(trailingOnly=TRUE)
 print("Parameters:")
@@ -107,7 +108,7 @@ workingDirIND <- file.path(args[3])
 inputfileD <- args[4]
 sampleId <- args[5]
 
-# ## for interactive tests:
+## INTERACTIVE INPUT
 # workingDirINC <- "Z:/forMiMB/input_files"
 # inputfileC <- "MiMB_dDSB_convert_dpp_to_wiggle_ASMv1_dpp5_config.R"
 # workingDirIND <- "Z:/forMiMB/mapping_results/scer_specific/dpp_files"

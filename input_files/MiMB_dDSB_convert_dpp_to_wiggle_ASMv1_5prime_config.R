@@ -1,4 +1,4 @@
-## Input for convert_sam.pe_commandLine.R, v.240329
+## Input for convert_sam.pe_commandLine.R, v.240416
 
 
 # reference genome
@@ -17,7 +17,7 @@ sepStrands <- TRUE    # FALSE | TRUE .. one wiggle file for each strand (only po
 withCal <- TRUE   # FALSE | TRUE .. signals (depths) will be multiplied by calibration factor provided in factorColumn, output file with suffix '_cal'
 withRpm <- FALSE  # FALSE | TRUE .. normalisation according aligned reads, depths multiplied by factor provided in factorColumn, output file with suffix '_rpm'
 workingDirINCF <- workingDirINC
-inputfileCF <- "MiMB_dDSB_ZP591.22_ASMv1_calFactors240221-rp10M.txt"  # (with column "Cal.Factor")
+inputfileCF <- "MiMB_dDSB_ZP591.22_ASMv1_calFactors240724-rp10M.txt"  # (with column "Cal.Factor")
 idColumnCF <- "Sample.id"
 factorColumn <- "Cal.Factor"  # e.g. "Cal.Factor" or "RP10M"
 digitsAC <- 3  # digits after comma in depth values of wiggle file

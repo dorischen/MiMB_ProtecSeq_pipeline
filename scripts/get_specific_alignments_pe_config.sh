@@ -1,8 +1,8 @@
 ##!/bin/bash
 
-ALIGNPATH=     # path for alignment tool (if not in $PATH)
-SAMTOOLSPATH=      # path for samtools (if not in $PATH)
-SEQTKPATH=      # path for seqtk tool (if not in $PATH)
-JAVASAMPATH=/mnt/Z/forMiMB/scripts/SAMManipulator/classes      # path for SAMManipulator.class (if not in $PATH)
-GENOMEPATH=/mnt/Z/forMiMB/input_files/genomes/      # path for reference genomes files
+ALIGNPATH=     # absolute path for alignment tool (if not in $PATH)
+SAMTOOLSPATH=      # absolute path for samtools (if not in $PATH)
+SEQTKPATH=      # absolute path for seqtk tool (if not in $PATH)
+JAVASAMPATH=/mnt/Z/forMiMB/test/scripts/     # absolute path for SAMManipulator.jar 
+GENOMEPATH=/mnt/Z/forMiMB/test/input_files/genomes/      # absolute path for reference genome files
   

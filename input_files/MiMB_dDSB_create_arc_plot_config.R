@@ -1,8 +1,9 @@
-## Input for create_arc_plot, v.240527
+## Input for create_arc_plot, v.240801
 
 
 # input file (fd format: chrom, start, length, depth)
-workingDirINF <- "Z:/forMiMB/mapping_results/scer_specific/fd_files"
+workingDirIN <- "Z:/forMiMB/test"
+workingDirINF <- paste0(workingDirIN,"/mapping_results/scer_specific/fd_files")
 filePatternF <- "_fd.txt"
 delimF <- "_"  # delimiter in input file name for finding sample id
 idIndexF <- 2  # index within input file name where sample id can be found after splitting at delimiter delimC
@@ -10,7 +11,7 @@ idIndexF <- 2  # index within input file name where sample id can be found after
 # reference file, displayed as bars (optional; dpp format: chrom, position, depth), e.g. Spo11 oligo 5prime ends
 withRef <- FALSE  # TRUE | FALSE
 plotOrder <- "refToFront" # "refToFront" .. bars will be plotted on top of arcs | "refToBack" .. arcs will be plotted on top of bars
-workingDirINR <- "Z:/forMiMB/input_files"
+workingDirINR <- workingDirINC
 inputfileR <- "Spo11.oligos_t4_ASMv1_5prime_dpp.txt"
 sampleNameR <- "Mohibullah (2017), wt t4"
 sampleNameRF <- "Moh.wt.t4" # will be added to output file name
@@ -23,7 +24,7 @@ selColorRT <- add_alpha(selColorR, alpha=1*255)  # alpha .. between 0 and 255; t
 
 # color table (optional); with sample id (same as in input file name) and color (R color name or #rrggbb)
 withColorTable <- TRUE  # if FALSE vColors needed !
-workingDirINS <- "Z:/forMiMB/input_files"
+workingDirINS <- workingDirINC
 inputfileS <- "MiMB_dDSB_sample_table.txt"
 idColumnS <- "SRA.id"  # column with sample ids for identification of input samples and corresponding colors
 colorColumnS <- "Color"
@@ -31,8 +32,8 @@ vColors <- c()   # needed if colorTable=FALSE; default: "black"
 
 # calibration factor table (optional)
 withCal <- TRUE
-workingDirINCF <- "Z:/forMiMB/input_files"
-inputfileCF <- "MiMB_dDSB_ZP591.22_ASMv1_calFactors240221-rp10M.txt"
+workingDirINCF <- workingDirINC
+inputfileCF <- "MiMB_dDSB_ZP591.22_ASMv1_calFactors240724-rp10M.txt"
 idColumnCF <- "Sample.id"   # column with sample ids for identification of input samples and corresponding calibration factors
 factorColumnCF <- "Cal.Factor"  # column containing calibration factor
 

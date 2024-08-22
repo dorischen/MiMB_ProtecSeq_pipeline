@@ -33,7 +33,7 @@ while getopts ":1:2:o:c:h" OPTION; do
 done
 
 case "$GENOME1" in
-		CBS138 ) SPECIES1=cgla ;;
+		CBS138 ) SPECIES1=ngla ;;
 	  ZP591.22 ) SPECIES1=skud ;;
 			 * ) echo "Unknown genome "$GENOME1" !!"
 			     exit 1 ;;
